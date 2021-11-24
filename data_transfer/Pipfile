@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+celery = "5.1.2"
+requests = "2.26.0"
+pydantic = "1.8.2"
+beautifulsoup4 = "*"
+cssutils = "==2.3.0"
+pymongo = "==3.12.1"
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"
