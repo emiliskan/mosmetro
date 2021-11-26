@@ -1,9 +1,11 @@
+import locale
+from datetime import datetime
+
 import requests
 
 import cssutils
 from bs4 import BeautifulSoup
 
-from core.config import settings
 from models.news_models import NewsModel
 from scrapers.base_scraper import AbstractScraper
 
@@ -14,8 +16,8 @@ class NewsScraper(AbstractScraper):
 
         scraped_data = []
 
-        URL = "https://mosmetro.ru/news"
-        page = requests.get(URL)
+        url = "https://mosmetro.ru/news"
+        page = requests.get(url)
 
         soup = BeautifulSoup(page.content, "html.parser")
 
@@ -28,6 +30,8 @@ class NewsScraper(AbstractScraper):
             "news-card news-card_filled news-card_big news__decorated"
         ]
 
+        locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
+        year = str(datetime.now().year)
         for class_name in classes:
             news = results.find_all("a", class_=class_name)
 
@@ -36,12 +40,15 @@ class NewsScraper(AbstractScraper):
                 link = article['href']
                 article_id = int(link[link.find('=') + 1:])
 
-                caption = article.find("div", class_="news-card__caption").text
-                date = article.find("div", class_="news-card__date").text
+                caption = article.find("div", class_="news-card__caption").text.strip()
+
+                date = article.find("div", class_="news-card__date").text.strip()
+                date = f'{year} {date}'
+                date = datetime.strptime(date, "%Y %d %B, %H:%M")
 
                 image = article.find("div", class_="news-card__image")
-                style = cssutils.parseStyle(image)
-                image_src = style['background-image']
+                style = cssutils.parseStyle(image['style'])
+                image_src = style['background-image'].replace('url(', '').replace(')', '')
 
                 news_data = NewsModel(
                     id=article_id,

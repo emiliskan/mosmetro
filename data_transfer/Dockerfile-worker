@@ -1,0 +1,19 @@
+FROM python:3.9
+WORKDIR /app
+ENV PYTHONPATH "${PYTHONPATH}:/app/"
+ENV PATH="${PATH}:/root/.local/bin"
+
+RUN apt update && \
+    apt -y upgrade && \
+    apt install -y python3-setuptools netcat && pip install pipenv && \
+    apt install -y locales && \
+    sed -i -e 's/# ru_RU.UTF-8 UTF-8/ru_RU.UTF-8 UTF-8/' /etc/locale.gen && \
+    dpkg-reconfigure --frontend=noninteractive locales
+
+COPY . .
+RUN pipenv install --system --deploy --skip-lock
+
+ENV LANG ru_RU.UTF-8
+ENV LC_ALL ru_RU.UTF-8
+
+CMD ["celery", "-A", "core.celery_app", "worker", "--loglevel=DEBUG", "-Q", "transfers"]

@@ -19,13 +19,9 @@ class DBConnection(BaseSettings):
 
 
 class Settings(BaseSettings):
-    test: bool = Field(False, env='SCRAPER_TEST')
+    test: bool = Field(True, env='SCRAPER_TEST')
     broker_url = Field('pyamqp://guest:guest@localhost//', env='BROKER_URL')
     db_connect: DBConnection = DBConnection()
 
 
 settings = Settings()
-
-LOGGER_CONFIG = pathlib.Path(__file__).parent / 'logging.conf'
-LOGGER_NAME = 'scraper'
-logging_config.fileConfig(LOGGER_CONFIG)

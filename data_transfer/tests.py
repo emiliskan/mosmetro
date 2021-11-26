@@ -3,7 +3,7 @@ from scrapers.news_scraper import get_news_scraper
 from transfer import Transfer
 
 
-def scrap_news():
+def _scrap_news():
     scraper = get_news_scraper()
     data = scraper.scrap()
     print(data)
@@ -18,5 +18,4 @@ def transfer_news():
 
 
 if __name__ == '__main__':
-    scrap_news()
     transfer_news()

@@ -4,7 +4,7 @@ from datetime import timedelta
 from .config import settings
 
 
-app = Celery('payment_service', broker=settings.broker_url, include=['tasks'])
+app = Celery('data_transfer', broker=settings.broker_url, include=['tasks'])
 
 if settings.test:
     SCHEDULE = timedelta(seconds=30)
@@ -12,10 +12,12 @@ else:
     SCHEDULE = timedelta(minutes=5)
 
 CELERYBEAT_SCHEDULE = {
-    'handle_pending_payments': {
+    'scrap_news': {
         'task': 'scrap_news',
         'schedule': SCHEDULE,
-        'options': {'queue': 'scraps'},
+        'options': {
+            'queue': 'transfers',
+        },
         'args': tuple(),
     },
 }

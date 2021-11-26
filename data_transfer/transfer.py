@@ -1,4 +1,4 @@
-from loaders.base_loader import NewsLoaderAbstract
+from loaders.base_loader import AbstractNewsLoader
 from scrapers.base_scraper import AbstractScraper
 
 
@@ -7,7 +7,7 @@ class Transfer:
     def __init__(
             self,
             scraper: AbstractScraper,
-            loader: NewsLoaderAbstract,
+            loader: AbstractNewsLoader,
     ):
         self.scraper = scraper
         self.loader = loader
