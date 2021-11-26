@@ -2,24 +2,38 @@ version: '3.8'
 
 services:
 
-#  news_api:
-#    container_name: news_api
-#    build: ./news_api
-#    volumes:
-#      - ./news_api:/app
-#    networks:
-#      - news-network
+  news_api:
+    container_name: news_api
+    build: ./news_api
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./news_api:/app
+    networks:
+      - news-network
+    env_file:
+      - .env
 
-  scarpers:
+  data_transfer:
     build:
-      context: ./scarpers
+      context: ./data_transfer
+      dockerfile: Dockerfile-worker
+    env_file:
+      - .env
+    networks:
+      - news-network
+
+  data_transfer_beat:
+    build:
+      context: ./data_transfer
+      dockerfile: Dockerfile-beat
+    env_file:
+      - .env
     networks:
       - news-network
 
   rabbit:
     image: rabbitmq:latest
-    logging:
-      driver: none
     ports:
       - "5672:5672"
     networks:
@@ -31,19 +45,13 @@ services:
     ports:
       - "27017:27017"
     restart: always
+    volumes:
+      - mongodbdata:/data/db
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
-
-  mongo-express:
-    image: mongo-express
-    restart: always
-    ports:
-      - "8081:8081"
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+      MONGO_INITDB_ROOT_USERNAME: $MONGO_USERNAME
+      MONGO_INITDB_ROOT_PASSWORD: $MONGO_PASSWORD
+    networks:
+      - news-network
 
 networks:
   news-network:
@@ -51,5 +59,5 @@ networks:
     driver: bridge
 
 volumes:
-  postgresdata:
-    name: postgresdata
+  mongodbdata:
+    name: mongodbdata
