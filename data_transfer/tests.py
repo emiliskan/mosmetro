@@ -1,6 +1,5 @@
 from loaders.news_loader import get_news_loader
 from scrapers.news_scraper import get_news_scraper
-from transfer import Transfer
 
 
 def _scrap_news():
@@ -10,11 +9,11 @@ def _scrap_news():
 
 
 def transfer_news():
-    news_transfer: Transfer = Transfer(
-        scraper=get_news_scraper(),
-        loader=get_news_loader(),
-    )
-    news_transfer.transfer()
+    scraper = get_news_scraper()
+    loader = get_news_loader()
+
+    news = scraper.scrap()
+    loader.load(news)
 
 
 if __name__ == '__main__':

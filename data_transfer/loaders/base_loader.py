@@ -1,10 +1,8 @@
 import abc
 
-from models.news_models import NewsModel
 
-
-class AbstractNewsLoader(abc.ABC):
+class AbstractLoader(abc.ABC):
 
     @abc.abstractmethod
-    def load(self, data: list[NewsModel]) -> None:
+    def load(self, data: list) -> None:
         ...

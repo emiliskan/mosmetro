@@ -6,4 +6,4 @@ client = MongoClient(settings.db_connect.connection)
 
 
 def get_db_client():
-    return client['metro']
+    return client[settings.db_connect.name]

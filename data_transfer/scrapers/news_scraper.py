@@ -2,12 +2,13 @@ import locale
 from datetime import datetime
 
 import requests
-
 import cssutils
 from bs4 import BeautifulSoup
 
 from models.news_models import NewsModel
 from scrapers.base_scraper import AbstractScraper
+
+NEWS_URL = 'https://mosmetro.ru/news'
 
 
 class NewsScraper(AbstractScraper):
@@ -16,37 +17,41 @@ class NewsScraper(AbstractScraper):
 
         scraped_data = []
 
-        url = "https://mosmetro.ru/news"
-        page = requests.get(url)
+        news_html = requests.get(NEWS_URL)
+        soup = BeautifulSoup(news_html.content, 'html.parser')
+        page = soup.find(id='page')
 
-        soup = BeautifulSoup(page.content, "html.parser")
-
-        results = soup.find(id="page")
-
-        classes = [
-            "news-card",
-            "news-card hidden",
-            "news-card news-card_filled news__decorated",
-            "news-card news-card_filled news-card_big news__decorated"
-        ]
+        news_classes = (
+            'news-card',
+            'news-card hidden',
+            'news-card news-card_filled news__decorated',
+            'news-card news-card_filled news-card_big news__decorated',
+        )
 
         locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
         year = str(datetime.now().year)
-        for class_name in classes:
-            news = results.find_all("a", class_=class_name)
+
+        for class_name in news_classes:
+            news = page.find_all('a', class_=class_name)
 
             for article in news:
 
+                caption = article.find('div', class_='news-card__caption').text.strip()
+
+                # ID новости лежит в ссылке. пр. link /detail/?news=906
                 link = article['href']
                 article_id = int(link[link.find('=') + 1:])
 
-                caption = article.find("div", class_="news-card__caption").text.strip()
+                # Дата приходит в формате '26 ноября, 20:15', преобразуем его в python объект
+                try:
+                    date = article.find('div', class_='news-card__date').text.strip()
+                    date = f'{year} {date}'
+                    date = datetime.strptime(date, '%Y %d %B, %H:%M')
+                except Exception:
+                    date = datetime.now()
 
-                date = article.find("div", class_="news-card__date").text.strip()
-                date = f'{year} {date}'
-                date = datetime.strptime(date, "%Y %d %B, %H:%M")
-
-                image = article.find("div", class_="news-card__image")
+                # URL на картинку лежит в стиле background-image
+                image = article.find('div', class_='news-card__image')
                 style = cssutils.parseStyle(image['style'])
                 image_src = style['background-image'].replace('url(', '').replace(')', '')
 

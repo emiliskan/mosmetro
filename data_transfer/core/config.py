@@ -1,8 +1,5 @@
 from typing import Optional
 
-import pathlib
-import logging.config as logging_config
-
 from pydantic import BaseSettings, Field, validator
 
 
@@ -11,6 +8,7 @@ class DBConnection(BaseSettings):
     port: int = Field(27017, env='MONGO_PORT')
     user: str = Field('root', env='MONGO_USERNAME')
     password: str = Field('example', env='MONGO_PASSWORD')
+    name: str = Field('metro', env='MONGO_DATABASE')
     connection: str = ''
 
     @validator("connection", pre=True)
@@ -19,7 +17,7 @@ class DBConnection(BaseSettings):
 
 
 class Settings(BaseSettings):
-    test: bool = Field(True, env='SCRAPER_TEST')
+    debug: bool = Field(True, env='SCRAPER_DEBUG')
     broker_url = Field('pyamqp://guest:guest@localhost//', env='BROKER_URL')
     db_connect: DBConnection = DBConnection()
 

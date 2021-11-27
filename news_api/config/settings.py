@@ -1,4 +1,5 @@
 from typing import Optional
+
 from pydantic import BaseSettings, Field, validator
 
 
@@ -7,10 +8,11 @@ class DBConnection(BaseSettings):
     port: int = Field(27017, env='MONGO_PORT')
     user: str = Field('root', env='MONGO_USERNAME')
     password: str = Field('example', env='MONGO_PASSWORD')
+    name: str = Field('metro', env='MONGO_DATABASE')
     connection: str = ''
 
-    @validator("connection", pre=True)
-    def set_connection(cls, v: Optional[str], values: dict) -> str:  # noqa
+    @validator('connection', pre=True)
+    def set_connection(cls, v: Optional[str], values: dict) -> str:
         return f'mongodb://{values["user"]}:{values["password"]}@{values["host"]}:{values["port"]}'
 
 

@@ -1,15 +1,15 @@
 from celery import Celery
 from datetime import timedelta
 
-from .config import settings
+from core.config import settings
 
 
 app = Celery('data_transfer', broker=settings.broker_url, include=['tasks'])
 
-if settings.test:
+if settings.debug:
     SCHEDULE = timedelta(seconds=30)
 else:
-    SCHEDULE = timedelta(minutes=5)
+    SCHEDULE = timedelta(minutes=10)
 
 CELERYBEAT_SCHEDULE = {
     'scrap_news': {
@@ -18,7 +18,7 @@ CELERYBEAT_SCHEDULE = {
         'options': {
             'queue': 'transfers',
         },
-        'args': tuple(),
+        'args': None,
     },
 }
 
