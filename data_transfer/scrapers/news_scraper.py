@@ -29,6 +29,7 @@ class NewsScraper(AbstractScraper):
         )
 
         locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
+
         year = str(datetime.now().year)
 
         for class_name in news_classes:
@@ -43,12 +44,9 @@ class NewsScraper(AbstractScraper):
                 article_id = int(link[link.find('=') + 1:])
 
                 # Дата приходит в формате '26 ноября, 20:15', преобразуем его в python объект
-                try:
-                    date = article.find('div', class_='news-card__date').text.strip()
-                    date = f'{year} {date}'
-                    date = datetime.strptime(date, '%Y %d %B, %H:%M')
-                except Exception:
-                    date = datetime.now()
+                date = article.find('div', class_='news-card__date').text.strip()
+                date = f'{year} {date}'
+                date = datetime.strptime(date, '%Y %d %B, %H:%M')
 
                 # URL на картинку лежит в стиле background-image
                 image = article.find('div', class_='news-card__image')
@@ -60,6 +58,7 @@ class NewsScraper(AbstractScraper):
                     caption=caption,
                     date=date,
                     image_src=image_src,
+                    scarp_date=datetime.now(),
                 )
                 scraped_data.append(news_data)
 

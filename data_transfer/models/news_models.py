@@ -8,3 +8,4 @@ class NewsModel(BaseModel):
     caption: str
     date: datetime
     image_src: str
+    scarp_date: datetime
